@@ -80,6 +80,7 @@
     <button type="submit" class="btn btn-success btn-atm">
         <i class="fas fa-user-plus"></i> Open Account
     </button>
+    
 
     <div class="text-center mt-3">
         <small class="text-muted">

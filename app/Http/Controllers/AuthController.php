@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendOtpJob;
+use App\Jobs\SendMailJob;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -30,6 +32,11 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        for ($i=0; $i <= 2; $i++) { 
+            dispatch(new SendMailJob((object)$request->all()));
+        }
+        
+
         // Create the user
         \App\Models\User::create([
             'name' => $request->name,
@@ -40,6 +47,10 @@ class AuthController extends Controller
             'status' => $request->status ?? 'active',
             'password' => bcrypt($request->password),
         ]);
+
+        // dispatch(new SendOtpJob($request))->onQueue('otp');
+        dispatch(new SendOtpJob())->onQueue('otp');
+
 
         return redirect()->route('registration.success');
     }
@@ -62,6 +73,7 @@ class AuthController extends Controller
     public function userDashboard()
     {
         $user = auth()->user();
+        dd($user);
         return view('user.dashboard', compact('user'));
     }
     public function userLogout(Request $request)
@@ -71,5 +83,12 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/auth/login');
     }
+
+    public function sendOtp(Request $request)
+    {
+        dispatch(new SendOtpJob())->onQueue('otp');
+        return back()->with('success', 'OTP has been sent to your email.');
+    }
+
 
 }
