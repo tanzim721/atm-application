@@ -52,7 +52,8 @@ class AuthController extends Controller
         dispatch(new SendOtpJob())->onQueue('otp');
 
 
-        return redirect()->route('registration.success');
+        // return redirect()->route('registration.success');
+        return redirect()->route('auth.login')->with('success', 'Registration successful! Please log in.');
     }
     public function login(Request $request)
     {
@@ -73,7 +74,6 @@ class AuthController extends Controller
     public function userDashboard()
     {
         $user = auth()->user();
-        dd($user);
         return view('user.dashboard', compact('user'));
     }
     public function userLogout(Request $request)
@@ -81,7 +81,7 @@ class AuthController extends Controller
         auth()->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/auth/login');
+        return redirect()->route('auth.login')->with('success', 'You have been logged out successfully.');
     }
 
     public function sendOtp(Request $request)
